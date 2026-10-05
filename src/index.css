@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-cinzel: 'Cinzel', serif;
+    --font-mincho: 'Shippori Mincho', serif;
+    --font-modern: 'Space Grotesk', sans-serif;
+    --font-syne: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+}
+
+.font-cinzel { font-family: 'Cinzel', serif; }
+.font-mincho { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; }
+.font-modern { font-family: 'Space Grotesk', sans-serif; }
+.font-syne { font-family: 'Syne', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Subtle celestial & geometric grid backgrounds */
+.bg-celestial-grid {
+  background-color: #0b0b0e;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(230, 57, 70, 0.09) 0%, transparent 55%),
+    radial-gradient(circle at 10% 80%, rgba(212, 163, 115, 0.05) 0%, transparent 45%),
+    linear-gradient(to right, rgba(245, 242, 235, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 242, 235, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+.bg-temple-pattern {
+  background-color: #0d0d12;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(230, 57, 70, 0.06) 0%, transparent 70%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 64px 64px, 64px 64px;
+}
+
+/* Japanese Vermilion Hanko Stamp effect */
+.hanko-stamp {
+  border: 1.5px solid #e63946;
+  color: #e63946;
+  box-shadow: inset 0 0 0 1px rgba(230, 57, 70, 0.4), 0 0 16px rgba(230, 57, 70, 0.2);
+}
+
+.hanko-gold {
+  border: 1.5px solid #d4a373;
+  color: #d4a373;
+  box-shadow: inset 0 0 0 1px rgba(212, 163, 115, 0.4), 0 0 16px rgba(212, 163, 115, 0.2);
+}
+
+/* Modernist poster fine borders and registration crosshairs */
+.poster-card {
+  position: relative;
+  background: rgba(18, 18, 24, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 242, 235, 0.12);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.poster-card:hover {
+  border-color: rgba(230, 57, 70, 0.6);
+  box-shadow: 0 12px 36px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(230, 57, 70, 0.15);
+}
+
+/* Custom scrollbar for game menus */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0b0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a35;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e63946;
+}
