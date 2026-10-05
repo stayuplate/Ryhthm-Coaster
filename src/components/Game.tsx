@@ -4,12 +4,20 @@
  * Aesthetic: Sacred Celestial Geometry, Japanese Constructivism,
  * High-Contrast Cinnabar & Sumi Ink.
  * 
- * Bulletproof timestamp-based countdown and audio synchronization.
+ * Featuring 4-Direction Acoustic Engine:
+ * - Left (0, Vermilion): Taiko Wood Strike (warm, deep organic membrane thump).
+ * - Up (1, Jade Green): Bamboo Wind Chime / Hyōshigi (airy, resonant bamboo strike).
+ * - Down (2, Solar Gold): Bronze Singing Bowl / Kin Bell (sacred metallic warmth).
+ * - Right (3, Bone White): Suikinkutsu Water Droplet (pristine crystal droplet ping).
+ * 
+ * - Seamless DSP music modulation (dynamic volume swell, sub kick, and resonant filter sweep).
+ * - Balanced, non-intrusive strike volume levels with customizable strike volume toggle (BALANCED / SOFT / CRISP / MUTED).
  */
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Note, GameResult } from '../types';
-import { Volume2, Play } from 'lucide-react';
+import { Play, Volume2, Sparkles } from 'lucide-react';
+import { AcousticModulator, IntensityMode, StrikeVolumeMode } from '../services/soundEffects';
 
 const TARGET_Y = 120;
 const NOTE_SPEED = 480; // pixels per second
@@ -20,15 +28,23 @@ const COLUMNS = 4;
 const COLUMN_WIDTH = 76;
 const COLUMN_SPACING = 20;
 
-const KEY_MAP = ['ArrowLeft', 'ArrowDown', 'ArrowUp', 'ArrowRight'];
+// Order: Left (1st), Up (2nd), Down (3rd), Right (4th)
+const KEY_MAP = ['ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight'];
 const COLOR_MAP = [
-  '#e63946', // Left: Vermilion / Cinnabar Red
-  '#d4a373', // Down: Warm Solar Amber / Gold
-  '#2a9d8f', // Up: Jade / Celestial Cyan
-  '#f5f2eb', // Right: Bone / Raw Rice Paper White
+  '#e63946', // Left (1st): Vermilion / Cinnabar Red
+  '#2a9d8f', // Up (2nd): Jade / Celestial Cyan / Green
+  '#d4a373', // Down (3rd): Warm Solar Amber / Yellow / Gold
+  '#f5f2eb', // Right (4th): Bone / Raw Rice Paper White
 ];
 
-const GLYPH_MAP = ['◂', '▾', '▴', '▸'];
+const DIRECTION_NAMES = [
+  { dir: 'LEFT', inst: 'Taiko Wood', glyph: '◂' },
+  { dir: 'UP', inst: 'Bamboo Chime', glyph: '▴' },
+  { dir: 'DOWN', inst: 'Bronze Bell', glyph: '▾' },
+  { dir: 'RIGHT', inst: 'Suikin Drop', glyph: '▸' },
+];
+
+const GLYPH_MAP = ['◂', '▴', '▾', '▸'];
 const KANJI_JUDGMENTS = {
   PERFECT: { kanji: '極', label: 'PERFECT', color: '#e63946' },
   GREAT: { kanji: '優', label: 'GREAT', color: '#2a9d8f' },
@@ -70,8 +86,12 @@ export function Game({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const modulatorRef = useRef<AcousticModulator | null>(null);
 
   const [needsUserTap, setNeedsUserTap] = useState(false);
+  const [intensityMode, setIntensityMode] = useState<IntensityMode>('VIVID');
+  const [strikeVolumeMode, setStrikeVolumeMode] = useState<StrikeVolumeMode>('BALANCED');
+  const [testQuality, setTestQuality] = useState<'PERFECT' | 'GREAT'>('PERFECT');
 
   // Initialize and clone notes safely
   const gameState = useRef({
@@ -99,6 +119,7 @@ export function Game({
   const handleManualStart = () => {
     const audio = audioRef.current;
     if (audio) {
+      modulatorRef.current?.resume();
       audio.play().then(() => {
         setNeedsUserTap(false);
       }).catch(console.error);
@@ -109,6 +130,13 @@ export function Game({
     const audio = audioRef.current;
     if (!audio) return;
 
+    // Attach acoustic modulator to dynamically influence the playing track
+    const modulator = new AcousticModulator();
+    modulator.intensity = intensityMode;
+    modulator.strikeVolume = strikeVolumeMode;
+    modulator.init(audio);
+    modulatorRef.current = modulator;
+
     gameState.current.startTime = performance.now();
     gameState.current.audioStarted = false;
 
@@ -117,6 +145,7 @@ export function Game({
       const col = KEY_MAP.indexOf(e.code);
       if (col !== -1) {
         e.preventDefault();
+        modulatorRef.current?.resume();
         if (!gameState.current.keysPressed[col]) {
           gameState.current.keysPressed[col] = true;
           gameState.current.keyFlash[col] = 1.0;
@@ -140,6 +169,7 @@ export function Game({
     const activeTouches = new Map<number, { startX: number; startY: number; triggered: boolean }>();
 
     const handleTouchStart = (e: TouchEvent) => {
+      modulatorRef.current?.resume();
       if (needsUserTap) {
         handleManualStart();
       }
@@ -174,11 +204,12 @@ export function Game({
               if (deltaX < 0) col = 0; // Left
               else col = 3; // Right
             } else {
-              if (deltaY > 0) col = 1; // Down
-              else col = 2; // Up
+              if (deltaY < 0) col = 1; // Up (deltaY < 0 is swipe up)
+              else col = 2; // Down (deltaY > 0 is swipe down)
             }
 
             if (col !== -1) {
+              modulatorRef.current?.resume();
               gameState.current.keysPressed[col] = true;
               gameState.current.keyFlash[col] = 1.0;
               setTimeout(() => {
@@ -219,6 +250,7 @@ export function Game({
       // Start audio after countdown
       if (elapsed >= COUNTDOWN_MS && !gameState.current.audioStarted) {
         gameState.current.audioStarted = true;
+        modulatorRef.current?.resume();
         audio.play().catch((err) => {
           console.warn("Autoplay policy prevented playback, tap required:", err);
           setNeedsUserTap(true);
@@ -229,6 +261,12 @@ export function Game({
       const totalWidth = COLUMNS * COLUMN_WIDTH + (COLUMNS - 1) * COLUMN_SPACING;
       const START_X = (canvas.width - totalWidth) / 2;
 
+      // Get and decay current sonic resonance level for visual feedback
+      const resLevel = modulatorRef.current?.getResonanceLevel() || 0;
+      if (modulatorRef.current) {
+        modulatorRef.current.decayResonance(0.016);
+      }
+
       // 1. Deep Obsidian & Sumi Ink Background
       ctx.fillStyle = '#0b0b0e';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -238,7 +276,7 @@ export function Game({
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height * 0.45);
       ctx.rotate(rotAngle);
-      ctx.strokeStyle = 'rgba(245, 242, 235, 0.035)';
+      ctx.strokeStyle = resLevel > 0.5 ? 'rgba(230, 57, 70, 0.12)' : 'rgba(245, 242, 235, 0.035)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(0, 0, 320, 0, Math.PI * 2);
@@ -296,6 +334,19 @@ export function Game({
         ctx.lineTo(x + COLUMN_WIDTH / 2, canvas.height);
         ctx.stroke();
         ctx.setLineDash([]);
+      }
+
+      // Dynamic Resonance Glow around Target Gate
+      if (resLevel > 0.05) {
+        ctx.save();
+        const glowColor = resLevel > 0.7 ? 'rgba(230, 57, 70,' : 'rgba(42, 157, 143,';
+        ctx.strokeStyle = `${glowColor} ${resLevel * 0.65})`;
+        ctx.lineWidth = 5 * resLevel;
+        ctx.beginPath();
+        ctx.moveTo(START_X - 50, TARGET_Y + COLUMN_WIDTH / 2);
+        ctx.lineTo(START_X + totalWidth + 50, TARGET_Y + COLUMN_WIDTH / 2);
+        ctx.stroke();
+        ctx.restore();
       }
 
       // 3. Judgment Target Gate
@@ -360,6 +411,8 @@ export function Game({
           gameState.current.misses++;
           gameState.current.lastJudgment = 'MISS';
           gameState.current.lastHitTime = performance.now();
+          // Muffle track briefly on missed note (underwater effect)
+          modulatorRef.current?.triggerImpact('MISS', note.column);
           continue;
         }
 
@@ -430,8 +483,8 @@ export function Game({
       const shockwaves = gameState.current.shockwaves;
       for (let i = shockwaves.length - 1; i >= 0; i--) {
         const sw = shockwaves[i];
-        sw.radius += 2.8;
-        sw.alpha *= 0.91;
+        sw.radius += 3.2;
+        sw.alpha *= 0.89;
 
         if (sw.alpha <= 0.02 || sw.radius >= sw.maxRadius) {
           shockwaves.splice(i, 1);
@@ -457,6 +510,7 @@ export function Game({
       ctx.fillStyle = '#e63946';
       ctx.fillRect(40, 24, (canvas.width - 80) * progressRatio, 2);
 
+      // Left HUD: Score & Time
       ctx.fillStyle = '#f5f2eb';
       ctx.font = 'bold 12px "JetBrains Mono", monospace';
       ctx.textAlign = 'left';
@@ -466,6 +520,32 @@ export function Game({
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.fillText(`TIME // ${formatTime(currentTime)} / ${formatTime(duration)}`, 40, 68);
 
+      // Center HUD: Acoustic Dynamic Resonance Meter & 4-Direction Indicator
+      ctx.save();
+      ctx.textAlign = 'center';
+      const barsCount = 10;
+      const filledBars = Math.round(resLevel * barsCount);
+      let resColor = 'rgba(245, 242, 235, 0.4)';
+      if (resLevel > 0.7) resColor = '#e63946'; // Perfect
+      else if (resLevel > 0.3) resColor = '#2a9d8f'; // Great
+      else if (resLevel > 0.05) resColor = '#d4a373'; // Good
+
+      ctx.fillStyle = resColor;
+      ctx.font = 'bold 9px "JetBrains Mono", monospace';
+      const barStr = '▮'.repeat(filledBars) + '▯'.repeat(barsCount - filledBars);
+      ctx.fillText(`SONIC RESONANCE [ ${barStr} ] // 4-DIR ACOUSTIC`, canvas.width / 2, 52);
+
+      ctx.fillStyle = 'rgba(245, 242, 235, 0.6)';
+      ctx.font = '8px "JetBrains Mono", monospace';
+      const statusText = resLevel > 0.7 
+        ? '★ HARMONIC BLOOM // +65% MUSIC SURGE & SUB PUNCH' 
+        : resLevel > 0.3 
+        ? '✦ ACOUSTIC SWELL // +34% MUSIC LIFT & RESONANT SWEEP' 
+        : '◂ TAIKO  •  ▴ BAMBOO  •  ▾ KIN BELL  •  ▸ SUIKIN DROP';
+      ctx.fillText(statusText, canvas.width / 2, 66);
+      ctx.restore();
+
+      // Right HUD: Combo & Overdrive
       ctx.textAlign = 'right';
       ctx.fillStyle = gameState.current.combo > 10 ? '#e63946' : '#f5f2eb';
       ctx.font = 'bold 13px "JetBrains Mono", monospace';
@@ -480,7 +560,7 @@ export function Game({
       if (lastJudg && performance.now() - gameState.current.lastHitTime < 520) {
         const judgData = KANJI_JUDGMENTS[lastJudg];
         const elapsedSinceHit = performance.now() - gameState.current.lastHitTime;
-        const scale = 1 + Math.sin(elapsedSinceHit / 80) * 0.08;
+        const scale = 1 + Math.sin(elapsedSinceHit / 80) * 0.12;
         const alpha = Math.max(0, 1 - elapsedSinceHit / 520);
 
         ctx.save();
@@ -489,18 +569,18 @@ export function Game({
         ctx.scale(scale, scale);
 
         ctx.strokeStyle = judgData.color;
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(-60, -32, 120, 64);
+        ctx.lineWidth = 2.0;
+        ctx.strokeRect(-64, -34, 128, 68);
 
         ctx.fillStyle = judgData.color;
-        ctx.font = 'bold 32px "Shippori Mincho", serif';
+        ctx.font = 'bold 34px "Shippori Mincho", serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(judgData.kanji, 0, -6);
 
         ctx.fillStyle = '#f5f2eb';
         ctx.font = 'bold 10px "JetBrains Mono", monospace';
-        ctx.fillText(judgData.label, 0, 18);
+        ctx.fillText(judgData.label, 0, 20);
         ctx.restore();
       }
 
@@ -545,8 +625,36 @@ export function Game({
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('touchcancel', handleTouchEnd);
       cancelAnimationFrame(animationFrameId);
+      modulator.dispose();
     };
-  }, [audioUrl]);
+  }, [audioUrl, intensityMode, strikeVolumeMode]);
+
+  const triggerManualTest = (judgment: 'PERFECT' | 'GREAT' | 'GOOD' | 'MISS', col: number = 0) => {
+    modulatorRef.current?.resume();
+    modulatorRef.current?.triggerImpact(judgment, col);
+
+    // Also trigger shockwave and particle visuals on canvas
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const totalWidth = COLUMNS * COLUMN_WIDTH + (COLUMNS - 1) * COLUMN_SPACING;
+      const startX = (canvas.width - totalWidth) / 2;
+      const cx = startX + col * (COLUMN_WIDTH + COLUMN_SPACING) + COLUMN_WIDTH / 2;
+      const cy = TARGET_Y + COLUMN_WIDTH / 2;
+
+      gameState.current.shockwaves.push({
+        x: cx,
+        y: cy,
+        radius: COLUMN_WIDTH / 3,
+        maxRadius: judgment === 'PERFECT' ? COLUMN_WIDTH * 2.0 : COLUMN_WIDTH * 1.5,
+        color: COLOR_MAP[col],
+        alpha: 1.0,
+        width: judgment === 'PERFECT' ? 3.5 : 2.2,
+      });
+
+      gameState.current.lastJudgment = judgment;
+      gameState.current.lastHitTime = performance.now();
+    }
+  };
 
   const handleHit = (col: number, currentTime: number) => {
     const state = gameState.current;
@@ -595,6 +703,11 @@ export function Game({
       state.lastJudgment = judgment;
       state.lastHitTime = performance.now();
 
+      // Bold dynamic DSP track modulation:
+      // Plays direction-specific organic instrument (Taiko, Bamboo, Kin Bell, or Suikinkutsu)
+      // modulated smoothly with the song's dynamic filter swell
+      modulatorRef.current?.triggerImpact(judgment, col);
+
       const canvas = canvasRef.current;
       if (canvas) {
         const totalWidth = COLUMNS * COLUMN_WIDTH + (COLUMNS - 1) * COLUMN_SPACING;
@@ -606,23 +719,23 @@ export function Game({
           x: cx,
           y: cy,
           radius: COLUMN_WIDTH / 3,
-          maxRadius: COLUMN_WIDTH * 1.5,
+          maxRadius: judgment === 'PERFECT' ? COLUMN_WIDTH * 2.0 : COLUMN_WIDTH * 1.5,
           color: COLOR_MAP[col],
-          alpha: 0.9,
-          width: 2.5,
+          alpha: judgment === 'PERFECT' ? 1.0 : 0.85,
+          width: judgment === 'PERFECT' ? 3.5 : 2.2,
         });
 
-        const count = judgment === 'PERFECT' ? 16 : 8;
+        const count = judgment === 'PERFECT' ? 22 : 10;
         for (let i = 0; i < count; i++) {
           const angle = Math.random() * Math.PI * 2;
-          const speed = 1.5 + Math.random() * 4.5;
+          const speed = (judgment === 'PERFECT' ? 3.0 : 1.8) + Math.random() * 5.0;
           state.particles.push({
             x: cx,
             y: cy,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             color: Math.random() > 0.3 ? COLOR_MAP[col] : '#ffffff',
-            size: 2 + Math.random() * 3,
+            size: 2 + Math.random() * 3.5,
             alpha: 1.0,
             decay: 0.02 + Math.random() * 0.03,
             rotation: Math.random() * Math.PI,
@@ -660,6 +773,7 @@ export function Game({
       <audio 
         ref={audioRef} 
         src={audioUrl} 
+        crossOrigin="anonymous"
         preload="auto"
         onEnded={handleAudioEnded} 
       />
@@ -685,21 +799,96 @@ export function Game({
       )}
 
       <div className="relative w-full max-w-[800px] flex flex-col items-center">
+        {/* Top Acoustic Telemetry & Multi-Timbre Directional Audition Bar */}
+        <div className="w-full flex flex-wrap items-center justify-between text-[11px] font-mono text-[#f5f2eb]/80 mb-2 px-1 gap-2">
+          {/* Controls: Effect & Strike Volume Toggles */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (modulatorRef.current) {
+                  const next = modulatorRef.current.cycleStrikeVolume();
+                  setStrikeVolumeMode(next);
+                }
+              }}
+              title="Click to toggle strike volume: BALANCED (pleasant), SOFT (gentle), CRISP (punchy), or MUTED (music DSP only)"
+              className="px-2.5 py-1 rounded bg-[#161622] hover:bg-white/10 border border-[#f5f2eb]/20 hover:border-[#f5f2eb]/50 text-[#f5f2eb] font-bold text-[10px] tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <Volume2 size={12} className={strikeVolumeMode === 'MUTED' ? 'text-zinc-500' : 'text-[#2a9d8f]'} />
+              <span>STRIKES: <span className={strikeVolumeMode === 'MUTED' ? 'text-zinc-400' : strikeVolumeMode === 'CRISP' ? 'text-[#e63946]' : 'text-[#2a9d8f]'}>{strikeVolumeMode}</span></span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (modulatorRef.current) {
+                  const next = modulatorRef.current.cycleIntensity();
+                  setIntensityMode(next);
+                }
+              }}
+              title="Click to toggle music filter modulation strength: VIVID (100%), ULTRA (150%), or SUBTLE (50%)"
+              className="px-2.5 py-1 rounded bg-[#161622] hover:bg-[#e63946]/20 border border-[#f5f2eb]/20 hover:border-[#e63946] text-[#f5f2eb] font-bold text-[10px] tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <Sparkles size={11} className={intensityMode === 'ULTRA' ? 'text-[#e63946]' : 'text-[#d4a373]'} />
+              <span>DSP: <span className={intensityMode === 'ULTRA' ? 'text-[#e63946]' : intensityMode === 'VIVID' ? 'text-[#2a9d8f]' : 'text-[#d4a373]'}>{intensityMode}</span></span>
+            </button>
+          </div>
+
+          {/* Directional Instrument Audition */}
+          <div className="flex flex-wrap items-center gap-1 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setTestQuality(q => q === 'PERFECT' ? 'GREAT' : 'PERFECT')}
+              className={`px-2 py-0.5 rounded border text-[9px] font-bold uppercase transition-colors cursor-pointer ${
+                testQuality === 'PERFECT' 
+                  ? 'bg-[#e63946]/20 border-[#e63946] text-[#e63946]' 
+                  : 'bg-[#2a9d8f]/20 border-[#2a9d8f] text-[#2a9d8f]'
+              }`}
+              title="Click to toggle audition between Perfect and Great quality"
+            >
+              {testQuality === 'PERFECT' ? '★ Perfect' : '✦ Good'}
+            </button>
+
+            {DIRECTION_NAMES.map((d, col) => (
+              <button
+                key={d.dir}
+                type="button"
+                onClick={() => triggerManualTest(testQuality, col)}
+                className="px-2 py-0.5 rounded bg-[#161622] hover:bg-white/10 border border-[#f5f2eb]/20 hover:border-white text-[#f5f2eb] transition-all cursor-pointer flex items-center gap-1"
+                style={{ borderColor: `${COLOR_MAP[col]}60` }}
+                title={`Click to preview ${d.inst} (${d.dir})`}
+              >
+                <span style={{ color: COLOR_MAP[col] }}>{d.glyph}</span>
+                <span className="hidden sm:inline text-[#f5f2eb]/80">{d.inst}</span>
+              </button>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => triggerManualTest('MISS', 0)}
+              className="px-2 py-0.5 rounded bg-[#161622] hover:bg-white/10 border border-white/20 text-white/50 hover:text-white transition-colors cursor-pointer text-[9px]"
+              title="Preview missed note muffle"
+            >
+              Miss
+            </button>
+          </div>
+        </div>
+
         <canvas
           ref={canvasRef}
           width={800}
           height={860}
-          className="border border-[#f5f2eb]/15 bg-[#0b0b0e] shadow-[0_0_60px_rgba(0,0,0,0.85)] max-w-full h-auto max-h-[92dvh] rounded-sm"
+          className="border border-[#f5f2eb]/15 bg-[#0b0b0e] shadow-[0_0_60px_rgba(0,0,0,0.85)] max-w-full h-auto max-h-[90dvh] rounded-sm"
         />
 
         <div className="w-full flex items-center justify-between text-[11px] font-mono text-[#f5f2eb]/50 mt-3 px-2">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#2a9d8f] animate-pulse" />
-            <span>KINETIC PROTOCOL ACTIVE // {gameState.current.notes.length} NOTES</span>
+            <span>KINETIC PROTOCOL ACTIVE // 4-TIMBRE ACOUSTIC MATRIX // DYNAMIC RESONANCE DSP</span>
           </div>
           <div className="text-right">
-            <span className="hidden md:inline">CONTROLS: ARROW KEYS [← ↓ ↑ →]</span>
-            <span className="md:hidden">TOUCH: SWIPE [LEFT, DOWN, UP, RIGHT]</span>
+            <span className="hidden md:inline">CONTROLS: ARROW KEYS [← ↑ ↓ →]</span>
+            <span className="md:hidden">TOUCH: SWIPE [LEFT, UP, DOWN, RIGHT]</span>
           </div>
         </div>
       </div>

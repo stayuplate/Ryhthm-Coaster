@@ -50,8 +50,8 @@ export function normalizeBeatmap(raw: unknown): Note[] {
     if (typeof col === 'string') {
       const lower = col.toLowerCase().trim();
       if (lower.includes('left') || lower === '0' || lower === 'l') col = 0;
-      else if (lower.includes('down') || lower === '1' || lower === 'd') col = 1;
-      else if (lower.includes('up') || lower === '2' || lower === 'u') col = 2;
+      else if (lower.includes('up') || lower === '1' || lower === 'u') col = 1;
+      else if (lower.includes('down') || lower === '2' || lower === 'd') col = 2;
       else if (lower.includes('right') || lower === '3' || lower === 'r') col = 3;
       else col = parseInt(col, 10) || 0;
     }

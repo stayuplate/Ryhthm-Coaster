@@ -455,12 +455,12 @@ export function Menu({ onStart, onSelectLibrarySong, errorMsg, hasKey, onSelectK
                   <span className="text-[10px] font-mono text-[#f5f2eb]/50">LEFT</span>
                 </div>
                 <div className="bg-[#0b0b0e] border border-[#f5f2eb]/20 p-3 text-center rounded-sm">
-                  <span className="block text-xl font-bold font-mono text-[#d4a373]">↓</span>
-                  <span className="text-[10px] font-mono text-[#f5f2eb]/50">DOWN</span>
-                </div>
-                <div className="bg-[#0b0b0e] border border-[#f5f2eb]/20 p-3 text-center rounded-sm">
                   <span className="block text-xl font-bold font-mono text-[#2a9d8f]">↑</span>
                   <span className="text-[10px] font-mono text-[#f5f2eb]/50">UP</span>
+                </div>
+                <div className="bg-[#0b0b0e] border border-[#f5f2eb]/20 p-3 text-center rounded-sm">
+                  <span className="block text-xl font-bold font-mono text-[#d4a373]">↓</span>
+                  <span className="text-[10px] font-mono text-[#f5f2eb]/50">DOWN</span>
                 </div>
                 <div className="bg-[#0b0b0e] border border-[#f5f2eb]/20 p-3 text-center rounded-sm">
                   <span className="block text-xl font-bold font-mono text-[#f5f2eb]">→</span>

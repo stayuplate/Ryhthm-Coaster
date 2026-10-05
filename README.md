@@ -36,8 +36,8 @@ Every stage can be **generated from thin air** using Google's Lyria neural model
 |        [ 律動 ]  RHYTHM COASTER                                                   |
 |                  NEURAL COMPOSITION FORGE & SACRED KINETIC RAIL                   |
 |                                                                                   |
-|  [01: ◂ LEFT ]    [02: ▾ DOWN ]    [03: ▴ UP ]    [04: ▸ RIGHT ]                  |
-|  VERMILION #e639  SOLAR GOLD #d4a3  JADE CYAN #2a9d BONE WHITE #f5f2              |
+|  [01: ◂ LEFT ]    [02: ▴ UP ]      [03: ▾ DOWN ]    [04: ▸ RIGHT ]                  |
+|  VERMILION #e639  JADE CYAN #2a9d  SOLAR GOLD #d4a3 BONE WHITE #f5f2              |
 +-----------------------------------------------------------------------------------+
 ```
 
@@ -123,11 +123,11 @@ Beatmaps are defined as lightweight JSON arrays. Each note object specifies when
 | Index | Key | Glyph | Color | Traditional Tone |
 | :---: | :---: | :---: | :---: | :--- |
 | `0` | `←` Left Arrow | `◂` | `#e63946` | **Cinnabar / Vermilion (朱色)** |
-| `1` | `↓` Down Arrow | `▾` | `#d4a373` | **Solar Ochre / Gold (琥珀)** |
-| `2` | `↑` Up Arrow | `▴` | `#2a9d8f` | **Jade / Celestial Cyan (青磁)** |
+| `1` | `↑` Up Arrow | `▴` | `#2a9d8f` | **Jade / Celestial Cyan / Green (青磁)** |
+| `2` | `↓` Down Arrow | `▾` | `#d4a373` | **Solar Ochre / Gold / Yellow (琥珀)** |
 | `3` | `→` Right Arrow | `▸` | `#f5f2eb` | **Bone / Raw Rice Paper (白磁)** |
 
-*Note: The parser automatically accepts both seconds and milliseconds, and supports nested schemas like `{ "notes": [...] }` or string directions (`"left"`, `"down"`, `"up"`, `"right"`).*
+*Note: The parser automatically accepts both seconds and milliseconds, and supports nested schemas like `{ "notes": [...] }` or string directions (`"left"`, `"up"`, `"down"`, `"right"`).*
 
 ---
 
@@ -136,8 +136,8 @@ Beatmaps are defined as lightweight JSON arrays. Each note object specifies when
 | Input | Desktop | Mobile / Touch |
 | :--- | :--- | :--- |
 | **Lane 0 (Left)** | `←` or `Left Arrow` | Swipe Left |
-| **Lane 1 (Down)** | `↓` or `Down Arrow` | Swipe Down |
-| **Lane 2 (Up)** | `↑` or `Up Arrow` | Swipe Up |
+| **Lane 1 (Up)** | `↑` or `Up Arrow` | Swipe Up |
+| **Lane 2 (Down)** | `↓` or `Down Arrow` | Swipe Down |
 | **Lane 3 (Right)** | `→` or `Right Arrow` | Swipe Right |
 
 ---
