@@ -1,0 +1,240 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 480" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#07070a"/>
+      <stop offset="50%" stop-color="#0a0a12"/>
+      <stop offset="100%" stop-color="#12111c"/>
+    </linearGradient>
+
+    <linearGradient id="redGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ff4d5e" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="cometRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#e63946" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="cometJade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a9d8f" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#2a9d8f" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="cometGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d4a373" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#d4a373" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="cometWhite" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <radialGradient id="sunAura" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.22"/>
+      <stop offset="60%" stop-color="#2a9d8f" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#07070a" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Filters for Bloom and Neon Glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Base Dark Canvas -->
+  <rect width="1280" height="480" fill="url(#bgGrad)"/>
+  <rect width="1280" height="480" fill="url(#sunAura)"/>
+
+  <!-- Precision Celestial Grid Lines -->
+  <g stroke="rgba(245, 242, 235, 0.04)" stroke-width="1">
+    <line x1="80" y1="0" x2="80" y2="480"/>
+    <line x1="1200" y1="0" x2="1200" y2="480"/>
+    <line x1="0" y1="60" x2="1280" y2="60"/>
+    <line x1="0" y1="420" x2="1280" y2="420"/>
+  </g>
+
+  <!-- Coordinate Registration Crosshairs (+) -->
+  <g stroke="#e63946" stroke-width="1.2" opacity="0.6">
+    <path d="M 75 60 H 85 M 80 55 V 65"/>
+    <path d="M 1195 60 H 1205 M 1200 55 V 65"/>
+    <path d="M 75 420 H 85 M 80 415 V 425"/>
+    <path d="M 1195 420 H 1205 M 1200 415 V 425"/>
+    <path d="M 635 60 H 645 M 640 55 V 65"/>
+  </g>
+
+  <!-- Sacred Concentric Astrolabe Rings -->
+  <g transform="translate(640, 220)">
+    <!-- Outer Orbit Ring with Dashes -->
+    <circle r="210" fill="none" stroke="rgba(230, 57, 70, 0.15)" stroke-width="1.5" stroke-dasharray="8 12"/>
+    <circle r="180" fill="none" stroke="rgba(245, 242, 235, 0.06)" stroke-width="1"/>
+    <circle r="150" fill="none" stroke="rgba(42, 157, 143, 0.12)" stroke-width="1.2"/>
+    <circle r="120" fill="none" stroke="rgba(212, 163, 115, 0.08)" stroke-width="1"/>
+
+    <!-- 12 Astrological Cardinal Rays -->
+    <g stroke="rgba(245, 242, 235, 0.08)" stroke-width="1">
+      <line x1="0" y1="-210" x2="0" y2="-175"/>
+      <line x1="0" y1="210" x2="0" y2="175"/>
+      <line x1="-210" y1="0" x2="-175" y2="0"/>
+      <line x1="210" y1="0" x2="175" y2="0"/>
+      <line x1="-148" y1="-148" x2="-124" y2="-124"/>
+      <line x1="148" y1="-148" x2="124" y2="-124"/>
+      <line x1="-148" y1="148" x2="-124" y2="124"/>
+      <line x1="148" y1="148" x2="124" y2="124"/>
+    </g>
+  </g>
+
+  <!-- Perspective Highway Tracks (Surging towards center) -->
+  <g stroke="rgba(245, 242, 235, 0.1)" stroke-width="1">
+    <!-- 5 convergent perspective rails -->
+    <line x1="460" y1="480" x2="520" y2="310"/>
+    <line x1="550" y1="480" x2="580" y2="310"/>
+    <line x1="640" y1="480" x2="640" y2="310" stroke="#e63946" stroke-opacity="0.3" stroke-dasharray="6 8"/>
+    <line x1="730" y1="480" x2="700" y2="310"/>
+    <line x1="820" y1="480" x2="760" y2="310"/>
+
+    <!-- Highway Speed Ticks -->
+    <line x1="485" y1="430" x2="795" y2="430" stroke="rgba(245, 242, 235, 0.06)"/>
+    <line x1="505" y1="380" x2="775" y2="380" stroke="rgba(245, 242, 235, 0.08)"/>
+    <line x1="520" y1="340" x2="760" y2="340" stroke="rgba(230, 57, 70, 0.15)"/>
+  </g>
+
+  <!-- 4 Radiant Directional Comet Notes on the Highway -->
+  <!-- Col 0: Vermilion Left -->
+  <polygon points="505,370 525,370 515,445" fill="url(#cometRed)"/>
+  <g transform="translate(515, 370) rotate(45)">
+    <rect x="-14" y="-14" width="28" height="28" fill="#14141e" stroke="#e63946" stroke-width="2.5" filter="url(#subtleGlow)"/>
+    <rect x="-7" y="-7" width="14" height="14" fill="#e63946"/>
+  </g>
+
+  <!-- Col 1: Jade Top -->
+  <polygon points="595,335 615,335 605,420" fill="url(#cometJade)"/>
+  <g transform="translate(605, 335) rotate(45)">
+    <rect x="-14" y="-14" width="28" height="28" fill="#14141e" stroke="#2a9d8f" stroke-width="2.5" filter="url(#subtleGlow)"/>
+    <rect x="-7" y="-7" width="14" height="14" fill="#2a9d8f"/>
+  </g>
+
+  <!-- Col 2: Amber Bottom -->
+  <polygon points="665,350 685,350 675,435" fill="url(#cometGold)"/>
+  <g transform="translate(675, 350) rotate(45)">
+    <rect x="-14" y="-14" width="28" height="28" fill="#14141e" stroke="#d4a373" stroke-width="2.5" filter="url(#subtleGlow)"/>
+    <rect x="-7" y="-7" width="14" height="14" fill="#d4a373"/>
+  </g>
+
+  <!-- Col 3: White Right -->
+  <polygon points="745,385 765,385 755,460" fill="url(#cometWhite)"/>
+  <g transform="translate(755, 385) rotate(45)">
+    <rect x="-14" y="-14" width="28" height="28" fill="#14141e" stroke="#ffffff" stroke-width="2.5" filter="url(#subtleGlow)"/>
+    <rect x="-7" y="-7" width="14" height="14" fill="#ffffff"/>
+  </g>
+
+  <!-- Hit Receptor Gate Shockwave Burst (Center Target) -->
+  <g transform="translate(605, 335)">
+    <circle r="36" fill="none" stroke="#2a9d8f" stroke-width="2" opacity="0.8" filter="url(#glow)"/>
+    <circle r="52" fill="none" stroke="#2a9d8f" stroke-width="1.2" opacity="0.4" stroke-dasharray="4 6"/>
+  </g>
+
+  <!-- Equalizer Spectrum Bars (Left & Right Flanks) -->
+  <g fill="#e63946" opacity="0.35">
+    <rect x="110" y="240" width="4" height="18" rx="1"/>
+    <rect x="120" y="220" width="4" height="38" rx="1"/>
+    <rect x="130" y="195" width="4" height="63" rx="1"/>
+    <rect x="140" y="210" width="4" height="48" rx="1"/>
+    <rect x="150" y="235" width="4" height="23" rx="1"/>
+  </g>
+  <g fill="#2a9d8f" opacity="0.35">
+    <rect x="1130" y="235" width="4" height="23" rx="1"/>
+    <rect x="1140" y="210" width="4" height="48" rx="1"/>
+    <rect x="1150" y="195" width="4" height="63" rx="1"/>
+    <rect x="1160" y="220" width="4" height="38" rx="1"/>
+    <rect x="1170" y="240" width="4" height="18" rx="1"/>
+  </g>
+
+  <!-- Header Top Protocol Telemetry Bar -->
+  <text x="80" y="42" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="bold" fill="#f5f2eb" opacity="0.7" letter-spacing="2">
+    PROTOCOL RC-26 <tspan fill="#e63946">|</tspan> NEURAL ACOUSTIC ENGINE
+  </text>
+  <text x="1200" y="42" text-anchor="end" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="10" font-weight="bold" fill="#d4a373" letter-spacing="2">
+    GOOGLE LYRIA AI <tspan fill="#f5f2eb" opacity="0.5">•</tspan> WEB AUDIO DSP
+  </text>
+
+  <!-- Hanko Seal Stamp (Ceremonial Japanese Red Crest) -->
+  <g transform="translate(1085, 95)">
+    <rect x="0" y="0" width="76" height="76" rx="6" fill="#e63946" opacity="0.15" stroke="#e63946" stroke-width="2.5" filter="url(#subtleGlow)"/>
+    <rect x="6" y="6" width="64" height="64" rx="4" fill="none" stroke="#e63946" stroke-width="1.2" opacity="0.6"/>
+    <text x="38" y="36" text-anchor="middle" font-family="'Shippori Mincho', serif, sans-serif" font-weight="bold" font-size="20" fill="#e63946" letter-spacing="2">
+      極音
+    </text>
+    <text x="38" y="58" text-anchor="middle" font-family="'Shippori Mincho', serif, sans-serif" font-weight="bold" font-size="16" fill="#e63946" letter-spacing="4">
+      律動
+    </text>
+  </g>
+
+  <!-- MAIN LOGO & HERO TITLE -->
+  <!-- Japanese Sacred Kicker -->
+  <text x="640" y="115" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold" fill="#d4a373" letter-spacing="6">
+    軌道律動神殿 // SACRED CELESTIAL ODYSSEY
+  </text>
+
+  <!-- Primary English Brand Name: RHYTHM COASTER -->
+  <g id="brandTitle" filter="url(#subtleGlow)">
+    <text x="640" y="195" text-anchor="middle" font-family="'Syne', 'Arial Black', sans-serif" font-size="68" font-weight="900" fill="#f5f2eb" letter-spacing="4">
+      RHYTHM <tspan fill="#e63946">COASTER</tspan>
+    </text>
+  </g>
+
+  <!-- Subtitle Tagline -->
+  <text x="640" y="235" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500" fill="#f5f2eb" opacity="0.75" letter-spacing="3">
+    ARCADE 3D PERSPECTIVE HIGHWAY <tspan fill="#2a9d8f">•</tspan> 4-DIRECTION ACOUSTIC DSP <tspan fill="#e63946">•</tspan> DIAMOND GAMEPAD
+  </text>
+
+  <!-- 4 Directional Acoustic Instruments Legend (Bilingual Pill-Free Badges) -->
+  <g transform="translate(640, 275)" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">
+    <!-- Col 0: Left Y -->
+    <g transform="translate(-270, 0)">
+      <circle cx="-12" cy="-4" r="5" fill="#e63946"/>
+      <text x="0" y="0" fill="#f5f2eb" letter-spacing="1">
+        [ Y ] ◂ TAIKO WOOD <tspan fill="#e63946" opacity="0.8">(太鼓)</tspan>
+      </text>
+    </g>
+
+    <!-- Col 1: Up X -->
+    <g transform="translate(-85, 0)">
+      <circle cx="-12" cy="-4" r="5" fill="#2a9d8f"/>
+      <text x="0" y="0" fill="#f5f2eb" letter-spacing="1">
+        [ X ] ▴ BAMBOO CHIME <tspan fill="#2a9d8f" opacity="0.8">(拍子木)</tspan>
+      </text>
+    </g>
+
+    <!-- Col 2: Down B -->
+    <g transform="translate(105, 0)">
+      <circle cx="-12" cy="-4" r="5" fill="#d4a373"/>
+      <text x="0" y="0" fill="#f5f2eb" letter-spacing="1">
+        [ B ] ▾ BRONZE BELL <tspan fill="#d4a373" opacity="0.8">(銅鐘)</tspan>
+      </text>
+    </g>
+
+    <!-- Col 3: Right A -->
+    <g transform="translate(290, 0)">
+      <circle cx="-12" cy="-4" r="5" fill="#ffffff"/>
+      <text x="0" y="0" fill="#f5f2eb" letter-spacing="1">
+        [ A ] ▸ SUIKIN DROP <tspan fill="#ffffff" opacity="0.8">(水琴窟)</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- Bottom Capability Badges -->
+  <g transform="translate(640, 448)" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold" fill="#f5f2eb" opacity="0.65" text-anchor="middle" letter-spacing="2">
+    <text>
+      3D PERSPECTIVE HIGHWAY <tspan fill="#e63946">/</tspan> COMET NOTE TRAILS <tspan fill="#2a9d8f">/</tspan> LIVE FREQUENCY EQUALIZER <tspan fill="#d4a373">/</tspan> MILLISECOND EARLY·LATE TELEMETRY
+    </text>
+  </g>
+</svg>

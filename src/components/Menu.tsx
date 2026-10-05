@@ -8,9 +8,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { DurationMode, Style, Difficulty, GenerationOptions } from '../types';
-import { Disc3, Sparkles, Compass, Radio, Activity, ArrowRight, Play, Volume2, ShieldAlert, Upload, Trash2, Plus } from 'lucide-react';
+import { Disc3, Sparkles, Compass, Radio, Activity, ArrowRight, Play, Volume2, ShieldAlert, Upload, Trash2, Plus, Gamepad2 } from 'lucide-react';
 import { FEATURED_SONGS, LibrarySong } from '../game/songs';
 import { SongImporterModal } from './SongImporterModal';
+import { GamepadAssistantModal } from './GamepadAssistantModal';
 import { getAllCustomSongs, deleteCustomSong } from '../services/songStorage';
 
 interface MenuProps {
@@ -29,6 +30,7 @@ export function Menu({ onStart, onSelectLibrarySong, errorMsg, hasKey, onSelectK
 
   const [customSongs, setCustomSongs] = useState<LibrarySong[]>([]);
   const [isImporterOpen, setIsImporterOpen] = useState(false);
+  const [isGamepadModalOpen, setIsGamepadModalOpen] = useState(false);
 
   useEffect(() => {
     getAllCustomSongs().then((songs) => {
@@ -81,7 +83,16 @@ export function Menu({ onStart, onSelectLibrarySong, errorMsg, hasKey, onSelectK
             <span className="text-[#f5f2eb]/30">|</span>
             <span>SONIC TEMPLE // PROTOCOL RC-26</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsGamepadModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 bg-[#161622] hover:bg-white/10 text-[#f5f2eb] border border-[#f5f2eb]/20 hover:border-white text-[11px] font-mono font-bold tracking-wider uppercase rounded-xs transition-all cursor-pointer"
+              title="Diagnose gamepad, Firefox setup, button calibration, or keyboard mapping"
+            >
+              <Gamepad2 size={13} className="text-[#2a9d8f]" />
+              <span>Gamepad / Controls</span>
+            </button>
             <span className="hidden sm:inline">LAT 35°41′N // LONG 139°46′E</span>
             <span className="px-2 py-0.5 border border-[#e63946]/40 text-[#e63946] font-semibold text-[10px] tracking-widest uppercase">
               LYRIA NEURAL ENGINE
@@ -130,15 +141,27 @@ export function Menu({ onStart, onSelectLibrarySong, errorMsg, hasKey, onSelectK
               </h2>
             </div>
             
-            {/* Import Custom Song Button */}
-            <button
-              type="button"
-              onClick={() => setIsImporterOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-[#e63946] hover:bg-[#d90429] text-white text-xs font-mono font-bold tracking-wider uppercase rounded-sm transition-all cursor-pointer shadow-[0_0_16px_rgba(230,57,70,0.3)]"
-            >
-              <Upload size={14} />
-              <span>Import Audio (.MP3)</span>
-            </button>
+            {/* Gamepad Setup & Import Custom Song Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsGamepadModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#161622] hover:bg-white/10 text-[#f5f2eb] border border-[#f5f2eb]/20 hover:border-white text-xs font-mono font-bold tracking-wider uppercase rounded-sm transition-all cursor-pointer"
+                title="Diagnose gamepad, wake up browser controller input, or calibrate buttons"
+              >
+                <Gamepad2 size={14} className="text-[#2a9d8f]" />
+                <span>Gamepad Setup</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsImporterOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-1.5 bg-[#e63946] hover:bg-[#d90429] text-white text-xs font-mono font-bold tracking-wider uppercase rounded-sm transition-all cursor-pointer shadow-[0_0_16px_rgba(230,57,70,0.3)]"
+              >
+                <Upload size={14} />
+                <span>Import Audio (.MP3)</span>
+              </button>
+            </div>
           </div>
 
           {customSongs.length === 0 ? (
@@ -540,6 +563,12 @@ export function Menu({ onStart, onSelectLibrarySong, errorMsg, hasKey, onSelectK
         onClose={() => setIsImporterOpen(false)}
         onPlaySong={onSelectLibrarySong}
         onSongSaved={handleCustomSongSaved}
+      />
+
+      {/* Gamepad Setup & Diagnostic Assistant Modal */}
+      <GamepadAssistantModal
+        isOpen={isGamepadModalOpen}
+        onClose={() => setIsGamepadModalOpen(false)}
       />
     </div>
   );

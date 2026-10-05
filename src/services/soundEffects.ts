@@ -35,6 +35,8 @@ export class AcousticModulator {
   private lowPassMuffle: BiquadFilterNode | null = null;
   private gainNode: GainNode | null = null;
   private compressor: DynamicsCompressorNode | null = null;
+  private analyser: AnalyserNode | null = null;
+  private freqDataArray: Uint8Array<ArrayBuffer> | null = null;
   private isAttached = false;
   private resonanceLevel = 0; // 0 to 1 for visual feedback
 
@@ -99,19 +101,32 @@ export class AcousticModulator {
         // Safe to ignore if not connected
       }
 
+      this.analyser = this.ctx.createAnalyser();
+      this.analyser.fftSize = 64; // 32 frequency bins, lightweight and fast
+
       this.source.connect(this.lowShelf);
       this.lowShelf.connect(this.sweepFilter);
       this.sweepFilter.connect(this.highShelf);
       this.highShelf.connect(this.lowPassMuffle);
       this.lowPassMuffle.connect(this.gainNode);
       this.gainNode.connect(this.compressor);
-      this.compressor.connect(this.ctx.destination);
+      this.compressor.connect(this.analyser);
+      this.analyser.connect(this.ctx.destination);
 
       this.isAttached = true;
-      console.info("AcousticModulator: Multi-timbre directional acoustic engine initialized.");
+      console.info("AcousticModulator: Multi-timbre directional acoustic engine initialized with spectrum analyser.");
     } catch (err) {
       console.warn("AcousticModulator: Audio routing fallback active:", err);
     }
+  }
+
+  public getAudioFrequencyData(): Uint8Array | null {
+    if (!this.analyser) return null;
+    if (!this.freqDataArray || this.freqDataArray.length !== this.analyser.frequencyBinCount) {
+      this.freqDataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    }
+    this.analyser.getByteFrequencyData(this.freqDataArray);
+    return this.freqDataArray;
   }
 
   public resume() {
